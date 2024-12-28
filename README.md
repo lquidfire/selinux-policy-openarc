@@ -35,6 +35,9 @@ Once that is done:
 ```
 # make -f /usr/share/selinux/devel/Makefile openarc.pp
 ...
+Compiling targeted openarc module
+Creating targeted openarc.pp policy package
+rm tmp/openarc.mod.fc tmp/openarc.mod
 # semodule -i openarc.pp
 ```
 If you install this SELinux policy after `openarc` has been installed and set up, remember to run `restorecon -v ...` on all `openarc` directories and files.
