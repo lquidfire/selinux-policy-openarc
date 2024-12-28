@@ -6,7 +6,7 @@ This SELinux policy currently works on AlmaLinux 9.5 running [OpenARC 1.2.0](htt
 
 In order to build this SELinux policy, you will need:
 
-* selinux-policy-devel
+* policycoreutils-devel
 * make
 * m4
 * python3
@@ -15,7 +15,7 @@ In order to build this SELinux policy, you will need:
 ### DNF-based systems
 
 ```
-# dnf install selinux-policy-devel
+# dnf install policycoreutils-devel
 ```
 
 ### Debian / Ubuntu
