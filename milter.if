@@ -11,6 +11,7 @@
 ## </param>
 #
 template(`milter_template',`
+	# attributes common to all milters
 	gen_require(`
 		attribute milter_data_type, milter_domains;
 	')
@@ -23,19 +24,26 @@ template(`milter_template',`
 	type $1_milter_t, milter_domains;
 	type $1_milter_exec_t;
 	init_daemon_domain($1_milter_t, $1_milter_exec_t)
+	#role system_r types $1_milter_t;
 
+	# Type for the milter data (e.g. the socket used to communicate with the MTA)
 	type $1_milter_data_t, milter_data_type;
 	files_runtime_file($1_milter_data_t)
+	#files_pid_file($1_milter_data_t)
 
 	########################################
 	#
 	# Policy
 	#
 
+	# Create other data files and directories in the data directory
 	manage_files_pattern($1_milter_t, $1_milter_data_t, $1_milter_data_t)
+	# Allow communication with MTA over a unix-domain socket
 	manage_sock_files_pattern($1_milter_t, $1_milter_data_t, $1_milter_data_t)
 
 	auth_use_nsswitch($1_milter_t)
+
+	logging_send_syslog_msg($1_milter_t)
 ')
 
 ########################################
@@ -55,6 +63,8 @@ interface(`milter_stream_connect_all',`
 	')
 
 	files_search_runtime($1)
+	#files_search_pids($1)
+	#getattr_dirs_pattern($1, milter_data_type, milter_data_type)
 	stream_connect_pattern($1, milter_data_type, milter_data_type, milter_domains)
 ')
 
@@ -73,7 +83,26 @@ interface(`milter_getattr_all_sockets',`
 		attribute milter_data_type;
 	')
 
+	#getattr_dirs_pattern($1, milter_data_type, milter_data_type)
 	getattr_sock_files_pattern($1, milter_data_type, milter_data_type)
+')
+
+########################################
+## <summary>
+##	Allow setattr of milter dirs
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`milter_setattr_all_dirs',`
+	gen_require(`
+		attribute milter_data_type;
+	')
+
+	setattr_dirs_pattern($1, milter_data_type, milter_data_type)
 ')
 
 ########################################
@@ -132,4 +161,42 @@ interface(`milter_getattr_data_dir',`
 	')
 
 	allow $1 spamass_milter_data_t:dir getattr;
+')
+
+#######################################
+## <summary>
+##	Delete dkim-milter PID files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`milter_delete_dkim_pid_files',`
+	gen_require(`
+		type dkim_milter_data_t;
+	')
+
+	files_search_pids($1)
+	delete_files_pattern($1, dkim_milter_data_t, dkim_milter_data_t)
+')
+
+#######################################
+## <summary>
+##	Delete OpenARC-milter PID files.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`milter_delete_openarc_pid_files',`
+	gen_require(`
+		type openarc_milter_data_t;
+	')
+
+	files_search_pids($1)
+	delete_files_pattern($1, openarc_milter_data_t, openarc_milter_data_t)
 ')
