@@ -1,6 +1,8 @@
 # SELinux policy for OpenARC
 
-This SELinux policy currently works on AlmaLinux 9.5 running [OpenARC 1.2.0](https://github.com/flowerysong/OpenARC/)+.
+This SELinux policy currently ~~works on AlmaLinux 9.5 running [OpenARC 1.2.0](https://github.com/flowerysong/OpenARC/)+~~ ready for merging with the SELinux RefPolicy.
+
+I will create a version that will work on AlmaLinux 9.5+ later in a separate branch.
 
 ## Dependencies
 
