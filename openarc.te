@@ -16,7 +16,6 @@ files_security_file(openarc_milter_private_key_t)
 type openarc_milter_unit_t;
 systemd_unit_file(openarc_milter_unit_t)
 
-#init_daemon_runtime_file(openarc_milter_data_t, dir, "openarc")
 init_daemon_run_dir(openarc_milter_data_t, "openarc")
 
 ########################################
@@ -39,10 +38,16 @@ corenet_udp_bind_generic_node(openarc_milter_t)
 corenet_udp_bind_all_unreserved_ports(openarc_milter_t)
 corenet_udp_bind_generic_port(openarc_milter_t)
 
+# Look up username for dropping privs
+auth_use_nsswitch(openarc_milter_t)
+
+sysnet_dns_name_resolve(openarc_milter_t)
+
 dev_read_urand(openarc_milter_t)
 # for cpu/online
 dev_read_sysfs(openarc_milter_t)
 
+# Allow creation of a pid file /run/openarc/openarc.pid
 files_pid_filetrans(openarc_milter_t, openarc_milter_data_t, { dir file })
 files_read_usr_files(openarc_milter_t)
 files_search_spool(openarc_milter_t)
@@ -56,6 +61,16 @@ optional_policy(`
 optional_policy(`
 	# set up unix socket
 	postfix_search_spool(openarc_milter_t)
+')
+
+optional_policy(`
+	require {
+        	type postfix_smtpd_t;
+        	type unlabeled_t;
+        	class sock_file write;
+	}
+
+	allow postfix_smtpd_t unlabeled_t:sock_file write;
 ')
 
 mta_read_config(openarc_milter_t)
