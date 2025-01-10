@@ -66,11 +66,12 @@ optional_policy(`
 optional_policy(`
 	require {
         	type postfix_smtpd_t;
-        	type unlabeled_t;
-        	class sock_file write;
+	        type openarc_milter_t;
+        	type var_run_t;
+        	class sock_file { create getattr unlink write };
 	}
-
-	allow postfix_smtpd_t unlabeled_t:sock_file write;
+	allow openarc_milter_t var_run_t:sock_file { create getattr unlink };
+	allow postfix_smtpd_t var_run_t:sock_file write;
 ')
 
 mta_read_config(openarc_milter_t)
